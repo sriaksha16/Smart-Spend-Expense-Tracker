@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>OTP Verification</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to right, #6a11cb, #2575fc);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .otp-container {
+            background: #fff;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+            width: 350px;
+            text-align: center;
+        }
+
+        .otp-container h2 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .otp-container label {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 10px;
+            color: #555;
+        }
+
+        .otp-container input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            outline: none;
+            font-size: 16px;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .otp-container input[type="text"]:focus {
+            border-color: #2575fc;
+            box-shadow: 0 0 5px #2575fc;
+        }
+
+        .otp-container button {
+            background: #2575fc;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+
+        .otp-container button:hover {
+            background: #6a11cb;
+        }
+
+        .resend-link {
+            margin-top: 15px;
+            display: block;
+            font-size: 14px;
+            color: #2575fc;
+            text-decoration: none;
+        }
+
+        .resend-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+<div class="otp-container">
+    <h2>OTP Verification</h2>
+    <form method="post" th:action="@{/verify-otp}">
+        <input type="hidden" name="email" th:value="${email}">
+        
+        <label>Enter OTP</label>
+        <input type="text" name="otp" placeholder="Enter the 6-digit code" required>
+        
+        <button type="submit">Verify OTP</button>
+    </form>
+
+    <a href="#" class="resend-link">Didn’t receive OTP? Resend</a>
+</div>
+</body>
+</html>

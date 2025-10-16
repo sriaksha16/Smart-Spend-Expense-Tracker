@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Notifications</title>
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client/dist/sockjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/stompjs/lib/stomp.min.js"></script>
+</head>
+<body>
+<h2>Your Notifications</h2>
+
+<!-- Notifications list from DB -->
+<ul id="notifications-list">
+    <li th:each="n : ${notifications}">
+        <span th:text="${n.message}"></span>
+        <small th:text="${#temporals.format(n.createdAt, 'dd-MM-yyyy HH:mm')}"></small>
+    </li>
+</ul>
+
+<form method="post" th:action="@{/notifications/mark-read}">
+    <button type="submit">Mark All as Read</button>
+</form>
+
+<script>
+    // Connect WebSocket
+    var socket = new SockJS('/ws');
+    var stompClient = Stomp.over(socket);
+
+    stompClient.connect({}, function (frame) {
+        console.log('Connected: ' + frame);
+
+        // Subscribe to user-specific queue
+        stompClient.subscribe('/user/queue/notifications', function (message) {
+            var notification = JSON.parse(message.body);
+
+            // Dynamically add new notification to the list
+            var li = document.createElement("li");
+            li.innerText = "🔔 " + notification.message;
+
+            document.getElementById("notifications-list").appendChild(li);
+        });
+    });
+</script>
+</body>
+</html>

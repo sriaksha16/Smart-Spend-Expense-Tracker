@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>My Budgets</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --primary-light: #4895ef;
+            --secondary: #3f37c9;
+            --success: #4cc9f0;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --gradient: linear-gradient(135deg, var(--primary), var(--success));
+            --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 20px 0;
+        }
+        
+        .budgets-container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        
+        .page-header {
+            background: var(--gradient);
+            color: white;
+            border-radius: 15px;
+            padding: 25px 30px;
+            margin-bottom: 30px;
+            box-shadow: var(--card-shadow);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .page-header::before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            transform: rotate(30deg);
+        }
+        
+        .page-header h2 {
+            margin: 0;
+            font-weight: 700;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .page-header p {
+            margin: 10px 0 0;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .stats-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 25px;
+            box-shadow: var(--card-shadow);
+            border-left: 5px solid var(--primary);
+        }
+        
+        .stats-card h5 {
+            color: var(--primary);
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .stats-card .amount {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--dark);
+        }
+        
+        .budget-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: var(--card-shadow);
+            transition: transform 0.3s, box-shadow 0.3s;
+            border-top: 4px solid var(--primary);
+        }
+        
+        .budget-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .budget-category {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .category-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-size: 1.2rem;
+            color: white;
+        }
+        
+        .category-name {
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: var(--dark);
+        }
+        
+        .budget-details {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        
+        .budget-amount {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        
+        .budget-period {
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+        
+        .progress {
+            height: 8px;
+            border-radius: 10px;
+            margin-top: 15px;
+        }
+        
+        .progress-bar {
+            border-radius: 10px;
+            background: var(--gradient);
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 50px 20px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: var(--card-shadow);
+        }
+        
+        .empty-state i {
+            font-size: 4rem;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 20px;
+        }
+        
+        .empty-state h4 {
+            color: var(--dark);
+            margin-bottom: 10px;
+        }
+        
+        .empty-state p {
+            color: #6c757d;
+            max-width: 500px;
+            margin: 0 auto 25px;
+        }
+        
+        .btn-primary {
+            background: var(--gradient);
+            border: none;
+            border-radius: 10px;
+            padding: 12px 25px;
+            font-weight: 600;
+            transition: all 0.3s;
+            box-shadow: 0 5px 15px rgba(67, 97, 238, 0.3);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(67, 97, 238, 0.4);
+        }
+        
+        .table-container {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: var(--card-shadow);
+        }
+        
+        .table thead {
+            background: var(--gradient);
+            color: white;
+        }
+        
+        .table th {
+            border: none;
+            padding: 15px;
+            font-weight: 600;
+        }
+        
+        .table td {
+            padding: 15px;
+            vertical-align: middle;
+            border-color: #f1f3f4;
+        }
+        
+        .table tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .badge-category {
+            background: rgba(67, 97, 238, 0.1);
+            color: var(--primary);
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-weight: 500;
+        }
+        
+        .view-toggle {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 20px;
+        }
+        
+        .toggle-btn {
+            background: white;
+            border: 2px solid #e9ecef;
+            padding: 8px 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .toggle-btn:first-child {
+            border-radius: 8px 0 0 8px;
+        }
+        
+        .toggle-btn:last-child {
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .toggle-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="budgets-container">
+            <!-- Page Header -->
+            <div class="page-header">
+                <h2><i class="fas fa-chart-pie me-2"></i>My Budgets</h2>
+                <p>Track and manage your monthly spending limits</p>
+            </div>
+            
+            <!-- Stats Cards (Example: You can calculate totals in controller and send via model) -->
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="stats-card">
+                        <h5>Total Budget</h5>
+                        <div class="amount" th:text="'$' + ${totalBudget}">0</div>
+                        <small class="text-muted">This month</small>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="stats-card">
+                        <h5>Categories</h5>
+                        <div class="amount" th:text="${totalCategories}">0</div>
+                        <small class="text-muted">Active budgets</small>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="stats-card">
+                        <h5>Balance</h5>
+                        <div class="amount" th:text="'$' + ${remaining}">0</div>
+                        <small class="text-muted">Available to spend</small>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- View Toggle -->
+            <div class="view-toggle">
+                <div class="btn-group">
+                    <span class="toggle-btn active" id="cardView">
+                        <i class="fas fa-th-large me-1"></i> Card View
+                    </span>
+                    <span class="toggle-btn" id="tableView">
+                        <i class="fas fa-table me-1"></i> Table View
+                    </span>
+                </div>
+            </div>
+            
+            <!-- Card View -->
+            <div id="cardViewContainer">
+                <div class="row" th:if="${not budgets.empty}">
+                    <div class="col-md-6 col-lg-4" th:each="b : ${budgets}">
+                        <div class="budget-card">
+                            <div class="budget-category">
+                                <div class="category-icon bg-primary">
+                                    <i class="fas fa-wallet"></i>
+                                </div>
+                                <div class="category-name" th:text="${b.category}">Category</div>
+                            </div>
+                            <div class="budget-details">
+                                <div class="budget-amount" th:text="'$' + ${b.amount}">$0</div>
+                                <div class="budget-period">
+									<span th:text="${T(com.example.smartexpense.service.BudgetService).getMonthName(b.month)} + ' ' + b.year">Month Year</span>
+
+                                </div>
+                            </div>
+                            <div class="progress">
+                                <div class="progress-bar" role="progressbar" style="width: 65%"></div>
+                            </div>
+                           <!-- <div class="d-flex justify-content-between mt-2">
+                                <small class="text-muted">Spent: $0</small>
+                                <small class="text-muted">Remaining: $0</small>
+                            </div>-->
+							<div class="d-flex justify-content-between mt-2">
+								<small class="text-muted" th:text="'Spent: $' + ${b['spent']}">Spent: $0</small>
+								<small class="text-muted" th:text="'Balance: $' + ${b['remaining']}">Balance: $0</small>
+
+							</div>
+
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Empty State -->
+                <div class="empty-state" th:if="${budgets.empty}">
+                    <i class="fas fa-wallet"></i>
+                    <h4>No Budgets Yet</h4>
+                    <p>You haven't set up any budgets for this month. Create your first budget to start tracking your expenses.</p>
+                    <a th:href="@{/budgets/new}" class="btn btn-primary">
+                        <i class="fas fa-plus me-2"></i>Create Your First Budget
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Table View -->
+            <div id="tableViewContainer" style="display: none;">
+                <div class="table-container">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Category</th>
+                                <th>Budgeted Amount</th>
+                                <th>Month</th>
+                                <th>Year</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="b : ${budgets}">
+                                <td><span class="badge-category" th:text="${b.category}">Category</span></td>
+                                <td th:text="'$' + ${b.amount}">$0</td>
+								<td th:text="${T(com.example.smartexpense.service.BudgetService).getMonthName(b.month)}">Month</td>
+                                <td th:text="${b.year}">Year</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- Add Budget Button -->
+            <div class="d-flex justify-content-end mt-4" th:if="${not budgets.empty}">
+                <a th:href="@{/budgets/new}" class="btn btn-primary">
+                    <i class="fas fa-plus me-2"></i>Add Budget
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // View toggle functionality
+        document.getElementById('cardView').addEventListener('click', function() {
+            document.getElementById('cardView').classList.add('active');
+            document.getElementById('tableView').classList.remove('active');
+            document.getElementById('cardViewContainer').style.display = 'block';
+            document.getElementById('tableViewContainer').style.display = 'none';
+        });
+        
+        document.getElementById('tableView').addEventListener('click', function() {
+            document.getElementById('tableView').classList.add('active');
+            document.getElementById('cardView').classList.remove('active');
+            document.getElementById('tableViewContainer').style.display = 'block';
+            document.getElementById('cardViewContainer').style.display = 'none';
+        });
+    </script>
+</body>
+</html>

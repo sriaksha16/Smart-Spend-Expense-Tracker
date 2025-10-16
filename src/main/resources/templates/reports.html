@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Reports</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        h2 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        canvas {
+            display: block;
+            margin: 30px auto;
+            max-width: 600px;
+        }
+    </style>
+</head>
+<body>
+<h2>Expense Reports</h2>
+
+<!-- Pie Chart -->
+<canvas id="categoryChart" width="400" height="200"></canvas>
+
+<!-- Line Chart -->
+<canvas id="monthlyChart" width="400" height="200"></canvas>
+
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    const userId = /*[[${userId}]]*/ 0;
+    const year = /*[[${year}]]*/ 0;
+    const month = /*[[${month}]]*/ 0;
+
+    // Fetch category totals for Pie Chart
+    fetch(`/reports/pie/${userId}/${year}/${month}`)
+        .then(response => response.json())
+        .then(data => {
+            const categories = Object.keys(data);
+            const categoryTotals = Object.values(data);
+
+            new Chart(document.getElementById("categoryChart"), {
+                type: 'pie',
+                data: {
+                    labels: categories,
+                    datasets: [{
+                        label: "Expenses Breakdown",
+                        data: categoryTotals,
+                        backgroundColor: [
+                            '#FF6384', '#36A2EB', '#FFCE56', '#4CAF50',
+                            '#9966FF', '#FF9F40', '#C9CBCF'
+                        ]
+                    }]
+                }
+            });
+        })
+        .catch(err => console.error("Error loading pie chart:", err));
+
+    // (Later: Fetch monthly trends for line chart)
+    /*]]>*/
+</script>
+
+</body>
+</html>

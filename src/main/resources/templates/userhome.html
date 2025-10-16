@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartExpense Tracker - Home</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #2575fc 0%, #6a11cb 100%);
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            padding: 20px 60px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        header h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+
+        nav {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        nav a {
+            color: #fff;
+            text-decoration: none;
+            font-weight: 500;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        nav a:hover {
+            color: #ffd369;
+        }
+
+        .hero {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 60px;
+            text-align: center;
+        }
+
+        .hero-content {
+            max-width: 700px;
+        }
+
+        .hero h2 {
+            font-size: 2.8rem;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+            padding: 50px 60px;
+            background: #fff;
+            color: #333;
+        }
+
+        .feature-card {
+            background: #f9f9f9;
+            border-radius: 16px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0px 6px 15px rgba(0,0,0,0.08);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0px 10px 20px rgba(0,0,0,0.15);
+        }
+
+        .feature-card i {
+            font-size: 2rem;
+            margin-bottom: 15px;
+            color: #2575fc;
+        }
+
+        .feature-card h3 {
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+        }
+
+        footer {
+            background: rgba(0, 0, 0, 0.2);
+            text-align: center;
+            padding: 20px;
+            font-size: 0.9rem;
+        }
+
+        nav a i {
+            font-size: 1.2rem;
+            transition: color 0.3s, transform 0.3s;
+        }
+
+        nav a:hover i {
+            color: #ffd369;
+            transform: rotate(-10deg);
+        }
+
+        /* Notification Styles */
+        .notifications {
+            position: relative;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+
+        .notifications .fa-bell {
+            font-size: 22px;
+            color: white;
+            transition: color 0.3s, transform 0.3s;
+        }
+
+        .notifications:hover .fa-bell {
+            color: #ffd369;
+            transform: scale(1.1);
+        }
+
+        .notifications .badge {
+            position: absolute;
+            top: -5px;
+            right: -8px;
+            background: #f72585;
+            color: white;
+            border-radius: 50%;
+            font-size: 12px;
+            width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            display: none;
+        }
+
+        .notifications .dropdown {
+            display: none;
+            position: absolute;
+            top: 35px;
+            right: 0;
+            background: white;
+            color: #212529;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            width: 280px;
+            max-height: 300px;
+            overflow-y: auto;
+            z-index: 1000;
+        }
+
+        .notifications:hover .dropdown {
+            display: block;
+        }
+
+        .notifications .dropdown ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .notifications .dropdown li {
+            padding: 12px 15px;
+            border-bottom: 1px solid #eee;
+            font-size: 14px;
+            transition: background-color 0.2s;
+        }
+
+        .notifications .dropdown li:last-child {
+            border-bottom: none;
+        }
+
+        .notifications .dropdown li:hover {
+            background-color: #f8f9ff;
+        }
+
+        .notification-header {
+            padding: 12px 15px;
+            background-color: #2575fc;
+            color: white;
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .clear-notifications {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 12px;
+            text-decoration: underline;
+        }
+
+        .no-notifications {
+            text-align: center;
+            padding: 20px;
+            color: #6c757d;
+            font-style: italic;
+        }
+
+        @media (max-width: 768px) {
+            header {
+                padding: 15px 20px;
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            nav {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .hero {
+                padding: 30px 20px;
+            }
+
+            .hero h2 {
+                font-size: 2rem;
+            }
+
+            .features {
+                padding: 30px 20px;
+            }
+
+            .notifications .dropdown {
+                right: -50px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1><i class="fas fa-chart-line"></i> SmartExpense</h1>
+
+    <nav>
+        <a th:href="@{/expenses/expenseshome}"><i class="fas fa-receipt"></i> Expenses</a>
+        <a th:href="@{/reports/viewreports}"><i class="fas fa-chart-bar"></i> Reports</a>
+        <a th:href="@{/budgets/new}"><i class="fas fa-wallet"></i> Budgets</a>
+        <a th:href="@{/budgets/view}"><i class="fas fa-chart-pie"></i> Budgets Plan</a>
+
+        <div class="notifications">
+            <i class="fas fa-bell"></i>
+            <span id="notification-count" class="badge"
+                  th:if="${notifications != null and notifications.size() > 0}"
+                  th:text="${notifications.size()}"></span>
+
+            <div class="dropdown" id="notification-dropdown">
+                <div class="notification-header">
+                    <span>Notifications</span>
+                    <form th:action="@{/notifications/clear}" method="post">
+                        <button type="submit" class="clear-notifications">Clear All</button>
+                    </form>
+                </div>
+
+                <ul id="notifications-list">
+                    <li th:if="${notifications == null or notifications.size() == 0}" class="no-notifications">
+                        No notifications yet
+                    </li>
+                    <li th:each="note : ${notifications}">
+                        <div class="notification-item">
+                            <div class="notification-content">
+                                <div th:text="${note.message}"></div>
+                                <div class="notification-time" th:text="${#dates.format(note.createdAt, 'dd MMM yyyy HH:mm')}"></div>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <a th:href="@{/logout}" title="Logout">
+            <i class="fas fa-sign-out-alt"></i>
+        </a>
+    </nav>
+</header>
+
+<section class="hero">
+    <div class="hero-content">
+        <h2>Track Your Finances Smarter, Live Stress-Free</h2>
+        <p>SmartExpense helps you monitor expenses, set budgets, and achieve your financial goals with interactive dashboards and real-time insights.</p>
+    </div>
+</section>
+
+<section id="features" class="features">
+    <div class="feature-card">
+        <i class="fas fa-chart-pie"></i>
+        <h3>Expense Analytics</h3>
+        <p>Welcome, <span th:text="${currentUserEmail}"></span></p>
+        <p>Visualize your spending habits with interactive charts and reports.</p>
+    </div>
+    <div class="feature-card">
+        <i class="fas fa-bell"></i>
+        <h3>Smart Alerts</h3>
+        <p>Get notified when you're about to exceed your budget limits.</p>
+    </div>
+    <div class="feature-card">
+        <i class="fas fa-mobile-alt"></i>
+        <h3>Access Anywhere</h3>
+        <p>Track and manage your expenses on any device, anytime.</p>
+    </div>
+    <div class="feature-card">
+        <i class="fas fa-shield-alt"></i>
+        <h3>Bank-Level Security</h3>
+        <p>Your financial data is encrypted and protected with industry standards.</p>
+    </div>
+</section>
+
+<footer>
+    <p>&copy; 2025 SmartExpense Tracker. All Rights Reserved.</p>
+</footer>
+
+</body>
+</html>

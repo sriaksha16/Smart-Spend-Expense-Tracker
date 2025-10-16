@@ -1,0 +1,1170 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Smart Spend - My Expenses</title>
+    <style>
+        :root {
+            --primary: #4361ee;
+            --primary-light: #4895ef;
+            --secondary: #3f37c9;
+            --success: #4cc9f0;
+            --danger: #f72585;
+            --warning: #f8961e;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --gray: #6c757d;
+            --border-radius: 10px;
+            --box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f5f7fb;
+            color: var(--dark);
+            line-height: 1.6;
+            padding: 0;
+            margin: 0;
+            padding-top: 80px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 15px 0;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.15);
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-shrink: 0;
+        }
+
+        .logo-icon {
+            font-size: 28px;
+            background: rgba(255, 255, 255, 0.2);
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .logo h1 {
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        .user-info {
+            background-color: rgba(255, 255, 255, 0.15);
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-weight: 500;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .user-info i {
+            font-size: 16px;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .export-buttons {
+            display: flex;
+            gap: 12px;
+        }
+
+        .main-content {
+            padding: 30px 0;
+        }
+
+        .page-title {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .page-title h2 {
+            font-size: 32px;
+            color: var(--dark);
+            font-weight: 700;
+            position: relative;
+            padding-bottom: 10px;
+        }
+
+        .page-title h2:after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 60px;
+            height: 4px;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            border-radius: 2px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 24px;
+            background-color: var(--primary);
+            color: white;
+            text-decoration: none;
+            border-radius: var(--border-radius);
+            font-weight: 600;
+            transition: var(--transition);
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(67, 97, 238, 0.3);
+            white-space: nowrap;
+        }
+
+        .btn:hover {
+            background-color: var(--secondary);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(67, 97, 238, 0.4);
+        }
+
+        .btn-small {
+            padding: 8px 16px;
+            font-size: 14px;
+        }
+
+        .btn-danger {
+            background-color: var(--danger);
+            box-shadow: 0 4px 12px rgba(247, 37, 133, 0.3);
+        }
+
+        .btn-danger:hover {
+            background-color: #e01e6d;
+        }
+
+        .btn-success {
+            background-color: #28a745;
+            box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+        }
+
+        .btn-success:hover {
+            background-color: #218838;
+        }
+
+        .btn-edit {
+            background-color: var(--warning);
+            box-shadow: 0 4px 12px rgba(248, 150, 30, 0.3);
+        }
+
+        .btn-edit:hover {
+            background-color: #e0871b;
+        }
+
+        .btn-report {
+            background-color: #6f42c1;
+            box-shadow: 0 4px 12px rgba(111, 66, 193, 0.3);
+        }
+
+        .btn-report:hover {
+            background-color: #5e34a1;
+        }
+
+        .btn i {
+            font-size: 16px;
+        }
+
+        .expense-table-container {
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            overflow: hidden;
+            margin-bottom: 30px;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+        }
+
+        th {
+            padding: 18px 20px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        tbody tr {
+            border-bottom: 1px solid #eaeaea;
+            transition: var(--transition);
+        }
+
+        tbody tr:hover {
+            background-color: #f8f9ff;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        td {
+            padding: 16px 20px;
+            font-size: 15px;
+        }
+
+        .amount {
+            font-weight: 700;
+            color: var(--dark);
+        }
+
+        .category {
+            display: inline-block;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .category-food {
+            background-color: rgba(76, 201, 240, 0.15);
+            color: var(--success);
+        }
+
+        .category-transport {
+            background-color: rgba(248, 150, 30, 0.15);
+            color: var(--warning);
+        }
+
+        .category-entertainment {
+            background-color: rgba(247, 37, 133, 0.15);
+            color: var(--danger);
+        }
+
+        .category-bills {
+            background-color: rgba(63, 55, 201, 0.15);
+            color: var(--secondary);
+        }
+
+        .category-shopping {
+            background-color: rgba(67, 97, 238, 0.15);
+            color: var(--primary);
+        }
+
+        .type-income {
+            color: #28a745;
+            font-weight: 600;
+        }
+
+        .type-expense {
+            color: #dc3545;
+            font-weight: 600;
+        }
+
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background-color: white;
+            border-radius: var(--border-radius);
+            padding: 25px;
+            box-shadow: var(--box-shadow);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            transition: var(--transition);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-card.primary {
+            border-top: 4px solid var(--primary);
+        }
+
+        .stat-card.success {
+            border-top: 4px solid var(--success);
+        }
+
+        .stat-card.warning {
+            border-top: 4px solid var(--warning);
+        }
+
+        .stat-card.danger {
+            border-top: 4px solid var(--danger);
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 700;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: var(--gray);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--gray);
+        }
+
+        .empty-state i {
+            font-size: 60px;
+            margin-bottom: 20px;
+            color: #dee2e6;
+        }
+
+        .empty-state h3 {
+            font-size: 22px;
+            margin-bottom: 10px;
+            color: var(--dark);
+        }
+
+        .empty-state p {
+            max-width: 500px;
+            margin: 0 auto 20px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        footer {
+            background: linear-gradient(135deg, var(--dark), #000);
+            color: white;
+            padding: 40px 0 20px;
+            margin-top: 50px;
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 20px;
+        }
+
+        .footer-links a {
+            color: #adb5bd;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .footer-links a:hover {
+            color: white;
+        }
+
+        .notifications {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .notification-icon {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 45px;
+            height: 45px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 50%;
+            transition: var(--transition);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .notification-icon:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: scale(1.05);
+        }
+
+        .notification-icon .fa-bell {
+            font-size: 20px;
+            color: white;
+        }
+
+        .notifications .badge {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            background: var(--danger);
+            color: white;
+            border-radius: 50%;
+            font-size: 11px;
+            padding: 3px 6px;
+            font-weight: bold;
+            min-width: 20px;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .notifications .dropdown {
+            display: none;
+            position: absolute;
+            top: 55px;
+            right: 0;
+            background: white;
+            color: var(--dark);
+            border-radius: var(--border-radius);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            width: 320px;
+            max-height: 400px;
+            overflow-y: auto;
+            z-index: 1001;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .notifications:hover .dropdown {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .notifications .dropdown-header {
+            padding: 15px 20px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #f8f9fa;
+        }
+
+        .notifications .dropdown-header h3 {
+            font-size: 16px;
+            margin: 0;
+            color: var(--dark);
+        }
+
+        .notifications .dropdown ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .notifications .dropdown li {
+            padding: 12px 20px;
+            border-bottom: 1px solid #eee;
+            font-size: 14px;
+            transition: var(--transition);
+        }
+
+        .notifications .dropdown li:last-child {
+            border-bottom: none;
+        }
+
+        .notifications .dropdown li:hover {
+            background-color: #f8f9ff;
+        }
+
+        .notifications .dropdown .notification-item.unread {
+            background-color: rgba(67, 97, 238, 0.05);
+            border-left: 3px solid var(--primary);
+        }
+
+        .notification-time {
+            font-size: 12px;
+            color: var(--gray);
+            margin-top: 5px;
+        }
+
+        /* New Filter Section Styles */
+        .filter-section {
+            background-color: white;
+            border-radius: var(--border-radius);
+            padding: 25px;
+            box-shadow: var(--box-shadow);
+            margin-bottom: 30px;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .filter-section h3 {
+            margin-bottom: 20px;
+            color: var(--dark);
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .filter-section h3 i {
+            color: var(--primary);
+        }
+
+        .filter-form {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--dark);
+        }
+
+        .form-group input,
+        .form-group select {
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            font-size: 15px;
+            transition: var(--transition);
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+        }
+
+        .filter-actions {
+            display: flex;
+            gap: 10px;
+            align-items: flex-end;
+        }
+
+        .btn-filter {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: var(--border-radius);
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-filter:hover {
+            background-color: var(--secondary);
+        }
+
+        .btn-clear {
+            background-color: #e9ecef;
+            color: var(--dark);
+            border: none;
+            padding: 12px 20px;
+            border-radius: var(--border-radius);
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-clear:hover {
+            background-color: #dee2e6;
+        }
+
+        /* Welcome message styling */
+        .welcome-message {
+            background: linear-gradient(135deg, var(--primary-light), var(--primary));
+            color: white;
+            padding: 15px 25px;
+            border-radius: var(--border-radius);
+            margin-bottom: 25px;
+            box-shadow: var(--box-shadow);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .welcome-message i {
+            font-size: 24px;
+        }
+
+        .welcome-message p {
+            margin: 0;
+            font-size: 16px;
+        }
+
+        .welcome-message b {
+            font-weight: 700;
+        }
+
+        /* Report Popup Styles */
+        .report-popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
+        }
+
+        .report-popup-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .report-popup {
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.2);
+            width: 90%;
+            max-width: 500px;
+            transform: translateY(-20px);
+            transition: var(--transition);
+            overflow: hidden;
+        }
+
+        .report-popup-overlay.active .report-popup {
+            transform: translateY(0);
+        }
+
+        .report-popup-header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 20px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .report-popup-header h3 {
+            font-size: 22px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .report-popup-header h3 i {
+            font-size: 24px;
+        }
+
+        .close-popup {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            transition: var(--transition);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .close-popup:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .report-popup-body {
+            padding: 30px 25px;
+        }
+
+        .report-popup-body p {
+            margin-bottom: 25px;
+            color: var(--gray);
+            text-align: center;
+        }
+
+        .report-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .report-option {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            padding: 25px 15px;
+            border-radius: var(--border-radius);
+            background-color: #f8f9fa;
+            transition: var(--transition);
+            cursor: pointer;
+            text-decoration: none;
+            color: var(--dark);
+        }
+
+        .report-option:hover {
+            background-color: #e9ecef;
+            transform: translateY(-5px);
+        }
+
+        .report-icon {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            color: white;
+        }
+
+        .report-icon.pdf {
+            background: linear-gradient(135deg, #f72585, #b5179e);
+        }
+
+        .report-icon.excel {
+            background: linear-gradient(135deg, #28a745, #20c997);
+        }
+
+        .report-option h4 {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        @media (max-width: 992px) {
+            .header-content {
+                flex-wrap: wrap;
+            }
+
+            .header-right {
+                order: 3;
+                width: 100%;
+                justify-content: center;
+                margin-top: 15px;
+            }
+
+            .filter-form {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding-top: 130px;
+            }
+
+            .header-content {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+
+            .header-right {
+                order: 0;
+                width: auto;
+                margin-top: 0;
+            }
+
+            .page-title {
+                flex-direction: column;
+                gap: 20px;
+                text-align: center;
+            }
+
+            .page-title h2:after {
+                left: 50%;
+                transform: translateX(-50%);
+            }
+
+            .expense-table-container {
+                overflow-x: auto;
+            }
+
+            table {
+                min-width: 700px;
+            }
+
+            .footer-content {
+                flex-direction: column;
+                gap: 20px;
+                text-align: center;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .export-buttons {
+                flex-direction: column;
+            }
+
+            .filter-form {
+                grid-template-columns: 1fr;
+            }
+
+            .filter-actions {
+                flex-direction: column;
+            }
+
+            .report-options {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header-right {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .notifications .dropdown {
+                width: 280px;
+                right: -100px;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="user-info">
+                    <i class="fas fa-user-circle"></i>
+                    <p>Welcome, <span th:text="${currentuser}">User</span></p>
+                </div>
+
+                <div class="logo">
+                    <div class="logo-icon">
+                        <i class="fas fa-chart-pie"></i>
+                    </div>
+                    <h1>Smart Spend</h1>
+                </div>
+
+                <div class="header-right">
+                    <div class="export-buttons">
+                        <button id="generate-report-btn" class="btn btn-report">
+                            <i class="fas fa-chart-bar"></i>
+                            Generate Report
+                        </button>
+                    </div>
+
+                  <!--  <div class="notifications">
+                        <div class="notification-icon">
+                            <i class="fas fa-bell"></i>
+                            <span id="notification-count" class="badge">3</span>
+                        </div>
+                        <div class="dropdown" id="notification-dropdown">
+                            <div class="dropdown-header">
+                                <h3>Notifications</h3>
+                                <a href="#" style="font-size: 12px; color: var(--primary);">Mark all as read</a>
+                            </div>
+                            <ul id="notifications-list">
+                                <li class="notification-item unread">
+                                    <div>New expense category added</div>
+                                    <div class="notification-time">2 hours ago</div>
+                                </li>
+                                <li class="notification-item unread">
+                                    <div>Monthly budget almost reached</div>
+                                    <div class="notification-time">1 day ago</div>
+                                </li>
+                                <li class="notification-item">
+                                    <div>Welcome to Smart Spend!</div>
+                                    <div class="notification-time">3 days ago</div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>-->
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="main-content">
+        <div class="container">
+            <div class="page-title">
+                <h2>My Expenses</h2>
+                <a href="/expenses/add/new" class="btn">
+                    <i class="fas fa-plus"></i>
+                    Add New Expense
+                </a>
+            </div>
+
+    
+
+            <!-- Filter Section -->
+            <div class="filter-section">
+                <h3><i class="fas fa-filter"></i> Filter Expenses</h3>
+                <form th:action="@{/expenses/filter}" method="get" class="filter-form">
+                    <input type="hidden" th:value="${user.id}" name="userId">
+
+                    <div class="form-group">
+                        <label for="category">Category</label>
+                        <select id="category" name="category">
+                            <option value="">All Categories</option>
+                            <option value="food">Food</option>
+                            <option value="transport">Transport</option>
+                            <option value="entertainment">Entertainment</option>
+                            <option value="bills">Bills</option>
+                            <option value="shopping">Shopping</option>
+                            <option value="Groceries">Groceries</option>
+                            <option value="Health">Health</option>
+                            <option value="Education">Education</option>
+                            <option value="Rent">Rent</option>
+                            <option value="Clothing">Clothing</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="start">Start Date</label>
+                        <input type="date" id="start" name="start">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="end">End Date</label>
+                        <input type="date" id="end" name="end">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="min">Min Amount</label>
+                        <input type="number" id="min" name="min" placeholder="Min Amount">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="max">Max Amount</label>
+                        <input type="number" id="max" name="max" placeholder="Max Amount">
+                    </div>
+
+                    <div class="filter-actions">
+                        <button type="submit" class="btn-filter">
+                            <i class="fas fa-search"></i>
+                            Apply Filters
+                        </button>
+                        <button type="reset" class="btn-clear">
+                            <i class="fas fa-undo"></i>
+                            Clear Filters
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="stats-container">
+                <div class="stat-card primary">
+                    <div class="stat-value" th:text="${balance}">$2,450.00</div>
+                    <div class="stat-label">Total Balance</div>
+                </div>
+                <div class="stat-card success">
+                    <div class="stat-value" th:text="${totalIncome}">$3,200.00</div>
+                    <div class="stat-label">Total Income</div>
+                </div>
+                <div class="stat-card warning">
+                    <div class="stat-value" th:text="${totalExpenses}">$750.00</div>
+                    <div class="stat-label">Total Expenses</div>
+                </div>
+                <div class="stat-card danger">
+                    <div class="stat-value" th:text="${transactionCount}">12</div>
+                    <div class="stat-label">Transactions</div>
+                </div>
+            </div>
+
+            <div class="expense-table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Amount</th>
+                            <th>Category</th>
+                            <th>Type</th>
+                            <th>Date</th>
+                            <th>Description</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="expense : ${expenses}">
+                            <td th:text="${expense.title}">Sample Title</td>
+                            <td class="amount" th:text="${expense.amount}">$0.00</td>
+                            <td>
+                                <span class="category" th:classappend="'category-' + ${expense.category.toLowerCase()}"
+                                    th:text="${expense.category}">
+                                    Category
+                                </span>
+                            </td>
+                            <td th:class="'type-' + ${expense.type.toLowerCase()}" th:text="${expense.type}">Type</td>
+                            <td th:text="${expense.date}">2023-01-01</td>
+                            <td th:text="${expense.description}">Description</td>
+                            <td class="action-buttons">
+                                <a th:href="@{'/expenses/edit/' + ${expense.id}}" class="btn btn-small btn-edit">
+                                    <i class="fas fa-edit"></i>
+                                    Edit
+                                </a>
+                                <a th:href="@{'/expenses/delete/' + ${expense.id}}" class="btn btn-small btn-danger"
+                                    onclick="return confirm('Are you sure?')">
+                                    <i class="fas fa-trash"></i>
+                                    Delete
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Report Popup -->
+    <div class="report-popup-overlay" id="report-popup-overlay">
+        <div class="report-popup">
+            <div class="report-popup-header">
+                <h3><i class="fas fa-file-export"></i> Export Report</h3>
+                <button class="close-popup" id="close-popup">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="report-popup-body">
+                <p>Choose your preferred format to export your expense report</p>
+                <div class="report-options">
+                    <a href="/expenses/export/pdf" class="report-option">
+                        <div class="report-icon pdf">
+                            <i class="fas fa-file-pdf"></i>
+                        </div>
+                        <h4>Export as PDF</h4>
+                    </a>
+                    <a href="/expenses/export/excel" class="report-option">
+                        <div class="report-icon excel">
+                            <i class="fas fa-file-excel"></i>
+                        </div>
+                        <h4>Export as Excel</h4>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="copyright">
+                    &copy; 2025 Smart Spend. All rights reserved.
+                </div>
+                <div class="footer-links">
+                    <a href="#">Privacy Policy</a>
+                    <a href="#">Terms of Service</a>
+                    <a href="#">Contact Us</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Import notification script -->
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+    <script src="/js/notifications.js"></script>
+
+    <script>
+        // Report Popup Functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const generateReportBtn = document.getElementById('generate-report-btn');
+            const reportPopupOverlay = document.getElementById('report-popup-overlay');
+            const closePopupBtn = document.getElementById('close-popup');
+            
+            // Open popup when Generate Report button is clicked
+            generateReportBtn.addEventListener('click', function() {
+                reportPopupOverlay.classList.add('active');
+            });
+            
+            // Close popup when close button is clicked
+            closePopupBtn.addEventListener('click', function() {
+                reportPopupOverlay.classList.remove('active');
+            });
+            
+            // Close popup when clicking outside the popup
+            reportPopupOverlay.addEventListener('click', function(e) {
+                if (e.target === reportPopupOverlay) {
+                    reportPopupOverlay.classList.remove('active');
+                }
+            });
+            
+            // Close popup with Escape key
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    reportPopupOverlay.classList.remove('active');
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

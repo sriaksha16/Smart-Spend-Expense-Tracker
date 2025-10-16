@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Smart Spend - Add Expense</title>
+    <style>
+        :root {
+            --primary: #4361ee;
+            --primary-light: #4895ef;
+            --secondary: #3f37c9;
+            --success: #4cc9f0;
+            --danger: #f72585;
+            --warning: #f8961e;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --gray: #6c757d;
+            --border-radius: 10px;
+            --box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f5f7fb;
+            color: var(--dark);
+            line-height: 1.6;
+            padding: 0;
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 20px 0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo-icon {
+            font-size: 24px;
+        }
+
+        .logo h1 {
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 20px;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+        }
+
+        .nav-links a:hover {
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 30px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .form-container {
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 40px;
+            width: 100%;
+            max-width: 600px;
+        }
+
+        .page-title {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .page-title h2 {
+            font-size: 28px;
+            color: var(--dark);
+            font-weight: 600;
+        }
+
+        .page-title i {
+            color: var(--primary);
+            font-size: 24px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: var(--border-radius);
+            font-size: 16px;
+            transition: var(--transition);
+            background-color: #f8fafc;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            background-color: white;
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+        }
+
+        textarea.form-control {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 14px 28px;
+            background-color: var(--primary);
+            color: white;
+            text-decoration: none;
+            border-radius: var(--border-radius);
+            font-weight: 600;
+            transition: var(--transition);
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            width: 100%;
+            box-shadow: 0 4px 12px rgba(67, 97, 238, 0.3);
+        }
+
+        .btn:hover {
+            background-color: var(--secondary);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(67, 97, 238, 0.4);
+        }
+
+        .btn i {
+            font-size: 16px;
+        }
+
+        .btn-secondary {
+            background-color: #6c757d;
+            box-shadow: 0 4px 12px rgba(108, 117, 125, 0.3);
+        }
+
+        .btn-secondary:hover {
+            background-color: #5a6268;
+            box-shadow: 0 6px 15px rgba(108, 117, 125, 0.4);
+        }
+
+        .form-footer {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .form-footer .btn {
+            flex: 1;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 20px;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+        }
+
+        .category-options {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-top: 8px;
+        }
+
+        .category-option {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 8px;
+            border: 2px solid #e2e8f0;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: var(--transition);
+            text-align: center;
+        }
+
+        .category-option:hover {
+            border-color: var(--primary-light);
+        }
+
+        .category-option.selected {
+            border-color: var(--primary);
+            background-color: rgba(67, 97, 238, 0.05);
+        }
+
+        .category-icon {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            color: white;
+            font-size: 14px;
+        }
+
+        .category-food .category-icon {
+            background-color: #4cc9f0;
+        }
+
+        .category-transport .category-icon {
+            background-color: #f8961e;
+        }
+
+        .category-entertainment .category-icon {
+            background-color: #f72585;
+        }
+
+        .category-bills .category-icon {
+            background-color: #3f37c9;
+        }
+
+        .category-shopping .category-icon {
+            background-color: #4361ee;
+        }
+
+        .category-groceries .category-icon {
+            background-color: #38b000;
+        }
+
+        .category-health .category-icon {
+            background-color: #e63946;
+        }
+
+        .category-education .category-icon {
+            background-color: #7209b7;
+        }
+
+        .category-rent .category-icon {
+            background-color: #ff9e00;
+        }
+
+        .category-clothing .category-icon {
+            background-color: #ff5d8f;
+        }
+
+        .category-other .category-icon {
+            background-color: #6c757d;
+        }
+
+        .type-toggle {
+            display: flex;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            border: 2px solid #e2e8f0;
+        }
+
+        .type-option {
+            flex: 1;
+            text-align: center;
+            padding: 12px;
+            cursor: pointer;
+            transition: var(--transition);
+            background-color: #f8fafc;
+        }
+
+        .type-option:first-child {
+            border-right: 1px solid #e2e8f0;
+        }
+
+        .type-option.selected {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .type-income.selected {
+            background-color: #28a745;
+        }
+
+        .type-expense.selected {
+            background-color: #dc3545;
+        }
+
+        footer {
+            background-color: var(--dark);
+            color: white;
+            padding: 30px 0;
+            margin-top: 50px;
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 20px;
+        }
+
+        .footer-links a {
+            color: #adb5bd;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .footer-links a:hover {
+            color: white;
+        }
+
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+            
+            .form-container {
+                padding: 25px;
+            }
+            
+            .form-row {
+                flex-direction: column;
+                gap: 0;
+            }
+            
+            .category-options {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            
+            .footer-content {
+                flex-direction: column;
+                gap: 20px;
+                text-align: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .category-options {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <div class="logo-icon">
+                        <i class="fas fa-chart-pie"></i>
+                    </div>
+                    <h1>Smart Spend</h1>
+                </div>
+                <div class="nav-links">
+                    <a th:href="@{/expenses/expenseshome}"><i class="fas fa-list"></i> View Expenses</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="main-content">
+        <div class="container">
+            <div class="form-container">
+                <div class="page-title">
+                    <i class="fas fa-plus-circle"></i>
+                    <h2>Add New Transaction</h2>
+                </div>
+
+                <form th:action="@{/expenses/save}" th:object="${expense}" method="post">
+                    <div class="form-group">
+                        <input type="hidden" th:field="*{id}">  <!-- ✅ needed for update -->
+                        
+                        <label for="title">Transaction Title</label>
+                        <input type="text" id="title" th:field="*{title}" class="form-control" placeholder="Enter transaction title" required>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="amount">Amount</label>
+                            <input type="number" id="amount" th:field="*{amount}" class="form-control" placeholder="0.00" step="0.01" min="0" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="date">Date</label>
+                            <input type="date" id="date" th:field="*{date}" class="form-control" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Transaction Type</label>
+                        <div class="type-toggle">
+                            <div class="type-option type-expense selected" data-value="EXPENSE">
+                                <i class="fas fa-arrow-up"></i> Expense
+                            </div>
+                            <div class="type-option type-income" data-value="INCOME">
+                                <i class="fas fa-arrow-down"></i> Income
+                            </div>
+                        </div>
+                        <input type="hidden" id="type" th:field="*{type}" value="EXPENSE">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Category</label>
+                        <div class="category-options">
+                            <div class="category-option category-food selected">
+                                <div class="category-icon">
+                                    <i class="fas fa-utensils"></i>
+                                </div>
+                                <span>Food</span>
+                            </div>
+                            <div class="category-option category-transport">
+                                <div class="category-icon">
+                                    <i class="fas fa-car"></i>
+                                </div>
+                                <span>Transport</span>
+                            </div>
+                            <div class="category-option category-entertainment">
+                                <div class="category-icon">
+                                    <i class="fas fa-film"></i>
+                                </div>
+                                <span>Entertainment</span>
+                            </div>
+                            <div class="category-option category-bills">
+                                <div class="category-icon">
+                                    <i class="fas fa-file-invoice-dollar"></i>
+                                </div>
+                                <span>Bills</span>
+                            </div>
+                            <div class="category-option category-shopping">
+                                <div class="category-icon">
+                                    <i class="fas fa-shopping-bag"></i>
+                                </div>
+                                <span>Shopping</span>
+                            </div>
+                            <div class="category-option category-groceries">
+                                <div class="category-icon">
+                                    <i class="fas fa-shopping-cart"></i>
+                                </div>
+                                <span>Groceries</span>
+                            </div>
+                            <div class="category-option category-health">
+                                <div class="category-icon">
+                                    <i class="fas fa-heartbeat"></i>
+                                </div>
+                                <span>Health</span>
+                            </div>
+                            <div class="category-option category-education">
+                                <div class="category-icon">
+                                    <i class="fas fa-graduation-cap"></i>
+                                </div>
+                                <span>Education</span>
+                            </div>
+                            <div class="category-option category-rent">
+                                <div class="category-icon">
+                                    <i class="fas fa-home"></i>
+                                </div>
+                                <span>Rent</span>
+                            </div>
+                            <div class="category-option category-clothing">
+                                <div class="category-icon">
+                                    <i class="fas fa-tshirt"></i>
+                                </div>
+                                <span>Clothing</span>
+                            </div>
+                            <div class="category-option category-other">
+                                <div class="category-icon">
+                                    <i class="fas fa-ellipsis-h"></i>
+                                </div>
+                                <span>Other</span>
+                            </div>
+                        </div>
+                        <input type="hidden" id="category" th:field="*{category}" value="Food">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="description">Description</label>
+                        <textarea id="description" th:field="*{description}" class="form-control" placeholder="Add any additional details about this transaction"></textarea>
+                    </div>
+
+                    <div class="form-footer">
+                        <a href="/expenses" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Cancel
+                        </a>
+                        <button type="submit" class="btn">
+                            <i class="fas fa-save"></i> Save Transaction
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="copyright">
+                    &copy; 2023 Smart Spend. All rights reserved.
+                </div>
+                <div class="footer-links">
+                    <a href="#">Privacy Policy</a>
+                    <a href="#">Terms of Service</a>
+                    <a href="#">Contact Us</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Transaction type toggle
+        document.querySelectorAll('.type-option').forEach(option => {
+            option.addEventListener('click', function() {
+                document.querySelectorAll('.type-option').forEach(opt => {
+                    opt.classList.remove('selected');
+                });
+                this.classList.add('selected');
+                document.getElementById('type').value = this.getAttribute('data-value');
+            });
+        });
+
+        // Category selection
+        document.querySelectorAll('.category-option').forEach(option => {
+            option.addEventListener('click', function() {
+                document.querySelectorAll('.category-option').forEach(opt => {
+                    opt.classList.remove('selected');
+                });
+                this.classList.add('selected');
+                document.getElementById('category').value = this.querySelector('span').textContent;
+            });
+        });
+
+        // Set today's date as default
+        document.getElementById('date').valueAsDate = new Date();
+    </script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
